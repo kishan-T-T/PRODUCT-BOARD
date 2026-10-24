@@ -1,0 +1,66 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans:
+    "Inter", "Inter var", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  --animate-pop: pop 0.14s ease-out;
+  --animate-fade: fade 0.15s ease-out;
+  --animate-slide-up: slide-up 0.22s ease-out;
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.97) translateY(-2px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+}
+
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(79 70 229 / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(79 70 229 / 0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+}

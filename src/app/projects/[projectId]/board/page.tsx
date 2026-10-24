@@ -1,0 +1,46 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { Board } from "@/components/project/board";
+import { FilterBar } from "@/components/project/filter-bar";
+import { getMembership, hasRole } from "@/lib/server/access";
+import { requireUser } from "@/lib/server/auth";
+import { fetchTasks, getProject, getProjectMembers, parseTaskFilters, type SearchParams } from "@/lib/server/queries";
+
+export const metadata: Metadata = { title: "Board" };
+
+export default async function BoardPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ projectId: string }>;
+  searchParams: Promise<SearchParams>;
+}) {
+  const { projectId } = await params;
+  const user = await requireUser();
+  const membership = await getMembership(projectId, user.id);
+  const project = await getProject(projectId);
+  if (!membership || !project) notFound();
+
+  const filters = parseTaskFilters(await searchParams);
+  const [tasks, members] = await Promise.all([
+    fetchTasks(project.id, project.key, filters, user.id, { ignoreStatus: true, sort: "manual" }),
+    getProjectMembers(project.id),
+  ]);
+
+  return (
+    <div className="flex h-full flex-col">
+      <Suspense>
+        <FilterBar
+          view="board"
+          members={members}
+          title={filters.assignee === "me" ? "My Board" : "Board"}
+          count={tasks.length}
+        />
+      </Suspense>
+      <div className="min-h-0 flex-1">
+        <Board tasks={tasks} projectId={project.id} canEdit={hasRole(membership.role, "member")} />
+      </div>
+    </div>
+  );
+}
